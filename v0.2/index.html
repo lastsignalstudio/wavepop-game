@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#eafaff">
+<meta name="description" content="WAVEPOP V0.2 — Bright futuristic arcade game">
+<title>WAVEPOP — V0.2</title>
+<style>
+:root{--ink:#25445f;--cyan:#42d9ee;--pink:#ff83ad;--violet:#9b8bff;--orange:#ffb45e}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dff8ff;color:var(--ink);font-family:Inter,ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:none;overscroll-behavior:none}
+#stage{position:fixed;inset:0}canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}
+.hud{position:fixed;inset:0;pointer-events:none;padding:calc(env(safe-area-inset-top) + 13px) 15px calc(env(safe-area-inset-bottom) + 14px)}
+.top{display:flex;justify-content:space-between;align-items:flex-start}.brand{font-weight:1000;letter-spacing:2px;font-size:19px;color:#338da7;text-shadow:0 2px #fff}.brand span{color:#9980f5}.version{font-size:9px;letter-spacing:2px;color:#83aabb;font-weight:900;margin-top:2px}
+.scorebox{background:#ffffffc9;border:1px solid #fff;border-radius:17px;padding:8px 13px;text-align:right;box-shadow:0 8px 25px #6abbd322;backdrop-filter:blur(12px);min-width:94px}.scorebox small{display:block;font-size:9px;font-weight:900;letter-spacing:1.5px;color:#7da1b4}.score{font-size:23px;font-weight:1000;line-height:1.1;font-variant-numeric:tabular-nums}
+.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 17px);left:15px;right:15px;display:flex;justify-content:space-between;align-items:end}.hint{font-size:10px;font-weight:900;letter-spacing:.3px;color:#5d8ba0;background:#ffffffb8;padding:10px 12px;border-radius:14px;backdrop-filter:blur(8px);max-width:calc(100% - 92px)}
+.wavebtn{pointer-events:auto;border:1px solid #ffffffaa;width:76px;height:76px;border-radius:26px;background:linear-gradient(145deg,#62e8f2,#8e9bff 65%,#c6a3ff);box-shadow:0 8px 0 #648bd8,0 16px 28px #5a9fcb55;color:white;font-size:12px;font-weight:1000;letter-spacing:1px;text-shadow:0 1px 2px #4388aa;touch-action:manipulation}.wavebtn:active{transform:translateY(4px);box-shadow:0 4px 0 #648bd8,0 9px 16px #5a9fcb55}.pause{pointer-events:auto;position:fixed;right:16px;top:calc(env(safe-area-inset-top) + 75px);border:1px solid #fff;background:#ffffffc9;border-radius:13px;width:40px;height:40px;font-size:16px;color:#508ca7;backdrop-filter:blur(8px)}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(180deg,#e9fbff55,#e9f2ff77);backdrop-filter:blur(8px)}.panel{width:min(390px,100%);text-align:center;padding:27px 23px 23px;border:1px solid #ffffff;border-radius:30px;background:linear-gradient(150deg,#ffffffed,#f3f8ffed);box-shadow:0 25px 80px #4c9cb733}.orb{width:82px;height:82px;margin:4px auto 14px;border-radius:50%;background:radial-gradient(circle at 32% 25%,#fff 0 8%,#bafaff 12%,#4cdaed 42%,#8b87ff 78%,#e9a8ff);box-shadow:inset -9px -12px 20px #6a68c866,0 12px 30px #65d8ed66;position:relative}.orb:after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;top:20px;left:23px;box-shadow:23px 6px 0 -2px #fff}.logo{font-size:42px;font-weight:1000;letter-spacing:3px;color:#39b8d3;text-shadow:0 3px #d7f8ff}.logo span{color:#9a83f3}.tag{font-size:10px;font-weight:900;letter-spacing:1.8px;color:#88a8b9;margin:4px 0 12px}.panel h1{font-size:23px;margin:5px 0 8px;color:#294d69}.panel p{font-size:13px;line-height:1.6;color:#7190a4;margin:0 auto 18px;max-width:295px}.mainbtn{border:0;border-radius:17px;padding:15px 25px;width:100%;background:linear-gradient(100deg,#45d5e9,#9b8bff);color:white;font-weight:1000;font-size:14px;letter-spacing:1px;box-shadow:0 6px 0 #7297db;touch-action:manipulation}.mainbtn:active{transform:translateY(3px);box-shadow:0 3px 0 #7297db}.tiny{font-size:10px;color:#9ab2c1;margin-top:14px}.hidden{display:none!important}.notice{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 105px);transform:translateX(-50%);padding:8px 12px;border-radius:12px;background:#ffffffc9;color:#578ba0;font-size:10px;font-weight:900;white-space:nowrap;pointer-events:none}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<div id="stage"></div>
+<div class="hud"><div class="top"><div><div class="brand">WAVE<span>POP</span></div><div class="version">ARCADE LAB · V0.2</div></div><div class="scorebox"><small>SCORE</small><div class="score" id="score">0000</div><small id="bestline">BEST 0000</small></div></div><div class="bottom"><div class="hint" id="hint">VUỐT TRÁI / PHẢI ĐỂ DI CHUYỂN</div><button class="wavebtn" id="wave">WAVE<br>✦</button></div></div>
+<button class="pause hidden" id="pause" aria-label="Tạm dừng">Ⅱ</button>
+<div class="overlay" id="start"><div class="panel"><div class="orb"></div><div class="logo">WAVE<span>POP</span></div><div class="tag">BEND THE WORLD · BEAT THE CHAOS</div><h1>Thế giới đang chờ bạn!</h1><p>Lướt qua đường đua nổi, thu thập tinh thể và giải phóng sóng năng lượng để biến chướng ngại thành cơ hội.</p><button class="mainbtn" id="play">BẮT ĐẦU CHƠI</button><div class="tiny">Vuốt để lái · Nhấn WAVE để phát xung năng lượng</div></div></div>
+<div class="overlay hidden" id="end"><div class="panel"><div class="orb"></div><div class="tag">RUN COMPLETE · V0.2</div><h1>Đường sóng kết thúc!</h1><p>Điểm của bạn</p><div id="finalscore" style="font-size:44px;font-weight:1000;color:#55bad3;margin:0 0 17px">0</div><button class="mainbtn" id="again">CHƠI LẠI</button><div class="tiny" id="newbest"></div></div></div>
+<div class="overlay hidden" id="paused"><div class="panel"><div class="tag">PAUSED</div><h1>Tạm nghỉ một chút</h1><p>Thế giới sóng đang chờ bạn.</p><button class="mainbtn" id="resume">TIẾP TỤC</button></div></div>
+<div class="overlay hidden" id="error"><div class="panel"><div class="tag">KHÔNG THỂ TẢI ĐỒ HỌA 3D</div><h1>Kiểm tra kết nối</h1><p>WAVEPOP V0.2 cần tải thư viện đồ họa Three.js từ CDN. Hãy kiểm tra Internet rồi tải lại trang.</p><button class="mainbtn" onclick="location.reload()">TẢI LẠI</button></div></div>
+<div class="notice hidden" id="notice">PERFECT WAVE!</div>
+<script type="module">
+import * as THREE from 'three';
+(()=>{'use strict';
+const $=id=>document.getElementById(id), stage=$('stage');
+let renderer,scene,camera,clock,player,playerGlow,track,objects=[],particles=[],waveRings=[],state='menu',score=0,best=+(localStorage.getItem('wavepop_best')||0),runTime=0,spawnTimer=.7,speed=10,targetX=0,playerX=0,shake=0,newRecord=false,dragging=false,pointerStart=0,targetStart=0;
+$('bestline').textContent='BEST '+String(best).padStart(4,'0');
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
+const mat=(color,roughness=.42,metalness=.08,emissive=0x000000,intensity=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness,emissive,emissiveIntensity:intensity});
+try{
+ renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.65));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;stage.appendChild(renderer.domElement);
+ scene=new THREE.Scene();scene.background=new THREE.Color(0xdaf7ff);scene.fog=new THREE.Fog(0xdaf7ff,23,62);
+ camera=new THREE.PerspectiveCamera(57,innerWidth/innerHeight,.1,100);camera.position.set(0,6.8,11.8);camera.lookAt(0,0,-5);
+ scene.add(new THREE.HemisphereLight(0xffffff,0x8acbd9,2.0));const sun=new THREE.DirectionalLight(0xffffff,2.5);sun.position.set(-5,12,7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);const fill=new THREE.PointLight(0x75eaff,35,30);fill.position.set(5,5,-8);scene.add(fill);
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),mat(0xeafaff,1));floor.rotation.x=-Math.PI/2;floor.position.y=-.45;floor.position.z=-35;floor.receiveShadow=true;scene.add(floor);
+ // Elevated runway with subtle segmented panels
+ const roadMat=mat(0xb9f0f5,.55,.12,0x48d9e8,.12);track=new THREE.Group();scene.add(track);
+ const road=new THREE.Mesh(new THREE.BoxGeometry(7.2,.32,58),roadMat);road.position.set(0,-.12,-20);road.receiveShadow=true;road.castShadow=true;track.add(road);
+ const edgeMat=mat(0x63d8e8,.3,.2,0x37d9ef,.55), laneMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.75});
+ for(const x of [-3.55,3.55]){const rail=new THREE.Mesh(new THREE.BoxGeometry(.16,.34,58),edgeMat);rail.position.set(x,.12,-20);track.add(rail)}
+ for(const x of [-1.2,1.2]){const line=new THREE.Mesh(new THREE.BoxGeometry(.035,.012,56),laneMat);line.position.set(x,.055,-20);track.add(line)}
+ const panelMat=mat(0xffffff,.7,0,0xffffff,.12);for(let z=5;z>-49;z-=4){const panel=new THREE.Mesh(new THREE.BoxGeometry(6.95,.018,.035),panelMat);panel.position.set(0,.055,z);track.add(panel)}
+ // Decorative floating arches along the horizon
+ const deco=new THREE.Group();scene.add(deco);for(let i=0;i<7;i++){const arch=new THREE.Mesh(new THREE.TorusGeometry(4.8,.045,8,64),new THREE.MeshStandardMaterial({color:i%2?0xffa9c5:0x8b9dff,emissive:i%2?0xff83ad:0x8b8bff,emissiveIntensity:.35,transparent:true,opacity:.55}));arch.position.set((i%2?1:-1)*5,2.2,-12-i*7);arch.scale.set(1,.72,1);deco.add(arch)}
+ // Energy creature: glossy sphere, halo, tiny eyes and trailing light
+ player=new THREE.Group();scene.add(player);player.position.set(0,.88,2.2);
+ const orb=new THREE.Mesh(new THREE.SphereGeometry(.48,32,24),new THREE.MeshPhysicalMaterial({color:0x62e4f1,roughness:.16,metalness:.12,clearcoat:1,clearcoatRoughness:.08,emissive:0x1c9eae,emissiveIntensity:.28}));orb.castShadow=true;player.add(orb);
+ const halo=new THREE.Mesh(new THREE.TorusGeometry(.66,.035,10,64),new THREE.MeshBasicMaterial({color:0x9d8bff,transparent:true,opacity:.8}));halo.rotation.x=Math.PI/2.5;player.add(halo);playerGlow=new THREE.PointLight(0x5ee9f3,2.2,5);playerGlow.position.set(0,.3,0);player.add(playerGlow);
+ const eyeMat=new THREE.MeshBasicMaterial({color:0xffffff}),pupilMat=new THREE.MeshBasicMaterial({color:0x356d8b});for(const x of [-.15,.15]){const eye=new THREE.Mesh(new THREE.SphereGeometry(.075,12,12),eyeMat);eye.position.set(x,.055,.405);player.add(eye);const pupil=new THREE.Mesh(new THREE.SphereGeometry(.03,10,10),pupilMat);pupil.position.set(x+.018,.045,.468);player.add(pupil)}
+ const smile=new THREE.Mesh(new THREE.TorusGeometry(.09,.012,6,18,Math.PI),new THREE.MeshBasicMaterial({color:0xffffff}));smile.position.set(0,-.105,.445);smile.rotation.z=Math.PI;player.add(smile);
+ clock=new THREE.Clock();
+}catch(e){console.error(e);$('error').classList.remove('hidden');return}
+function makeCrystal(){const g=new THREE.Group();const core=new THREE.Mesh(new THREE.OctahedronGeometry(.43,0),new THREE.MeshPhysicalMaterial({color:0x8ef4ff,roughness:.12,metalness:.2,clearcoat:1,emissive:0x24d5e8,emissiveIntensity:.55}));core.castShadow=true;g.add(core);const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.025,8,32),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.85}));ring.rotation.x=Math.PI/2;g.add(ring);return g}
+function makeHazard(type){const g=new THREE.Group();if(type==='spike'){const m=new THREE.Mesh(new THREE.ConeGeometry(.48,.9,5),new THREE.MeshStandardMaterial({color:0xffa46f,roughness:.3,metalness:.12,emissive:0xff6d42,emissiveIntensity:.28}));m.position.y=.42;m.castShadow=true;g.add(m);const base=new THREE.Mesh(new THREE.CylinderGeometry(.48,.55,.12,6),mat(0xffd3a9));base.position.y=.06;g.add(base)}else{const frame=new THREE.Mesh(new THREE.TorusGeometry(.56,.12,8,4),new THREE.MeshStandardMaterial({color:0x9a8cff,metalness:.25,roughness:.24,emissive:0x7468ff,emissiveIntensity:.4}));frame.scale.set(1,1.15,1);frame.rotation.y=Math.PI/4;frame.position.y=.65;g.add(frame)}return g}
+function spawnObject(){const r=Math.random(),type=r<.49?'crystal':r<.78?'spike':'gate',x=rand(-2.65,2.65);const mesh=type==='crystal'?makeCrystal():makeHazard(type);mesh.position.set(x,type==='crystal'?1.05:.0,-35);scene.add(mesh);objects.push({type,x,z:-35,mesh,hit:false,spin:rand(0,6)})}
+function burst(pos,color,count=14){for(let i=0;i<count;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(rand(.035,.09),7,6),new THREE.MeshBasicMaterial({color,transparent:true}));m.position.copy(pos);scene.add(m);particles.push({mesh:m,v:new THREE.Vector3(rand(-1.8,1.8),rand(.2,2.5),rand(-1.8,1.8)),life:rand(.35,.8),max:.8})}}
+function wave(){if(state!=='play')return;const ring=new THREE.Mesh(new THREE.TorusGeometry(.65,.055,10,64),new THREE.MeshBasicMaterial({color:0x7bf4ff,transparent:true,opacity:.95}));ring.rotation.x=Math.PI/2;ring.position.set(playerX,.24,1.4);scene.add(ring);waveRings.push({mesh:ring,life:.8,max:.8,radius:.65,hit:new Set()});burst(new THREE.Vector3(playerX,.55,1.3),0x7befff,10);$('notice').classList.remove('hidden');setTimeout(()=>$('notice').classList.add('hidden'),500)}
+function clearObjects(){for(const o of objects)scene.remove(o.mesh);objects=[];for(const p of particles)scene.remove(p.mesh);particles=[];for(const w of waveRings)scene.remove(w.mesh);waveRings=[]}
+function reset(){clearObjects();score=0;runTime=0;speed=10;spawnTimer=.5;playerX=targetX=0;shake=0;newRecord=false;player.position.x=0;$('score').textContent='0000';for(let i=0;i<6;i++){spawnObject();objects[i].z=-35-i*5;objects[i].mesh.position.z=objects[i].z}}
+function start(){reset();state='play';$('start').classList.add('hidden');$('end').classList.add('hidden');$('paused').classList.add('hidden');$('pause').classList.remove('hidden')}
+function finish(){if(state!=='play')return;state='end';$('pause').classList.add('hidden');$('finalscore').textContent=score.toLocaleString('vi-VN');newRecord=score>best;if(newRecord){best=score;localStorage.setItem('wavepop_best',best);$('bestline').textContent='BEST '+String(best).padStart(4,'0')}$('newbest').textContent=newRecord?'✨ KỶ LỤC MỚI!':'BEST '+best.toLocaleString('vi-VN');$('end').classList.remove('hidden')}
+function update(dt){if(state!=='play')return;runTime+=dt;speed=Math.min(17,10+runTime*.19);score+=Math.floor(dt*8);$('score').textContent=String(score).padStart(4,'0');playerX+=(targetX-playerX)*Math.min(1,dt*10);player.position.x=playerX;player.position.y=.88+Math.sin(runTime*5)*.07;player.rotation.z=-(targetX-playerX)*.12;player.rotation.y=Math.sin(runTime*2)*.08;player.children[1].rotation.z+=dt*1.2;
+ camera.position.x+=(playerX*.2-camera.position.x)*Math.min(1,dt*2.5);camera.position.y=6.8+Math.sin(runTime*1.1)*.12;camera.lookAt(playerX*.12,.2,-5);deco.rotation.z=Math.sin(runTime*.25)*.025;
+ spawnTimer-=dt;if(spawnTimer<=0){spawnObject();spawnTimer=rand(.78,1.12)*(10/speed)}
+ for(const o of objects){o.z+=speed*dt;o.mesh.position.z=o.z;o.spin+=dt*1.7;o.mesh.rotation.y=o.spin;if(o.type==='crystal'){o.mesh.position.y=1.05+Math.sin(runTime*4+o.spin)*.13;o.mesh.rotation.z=Math.sin(o.spin)*.15}else o.mesh.rotation.y=o.spin*.55;
+ if(!o.hit&&o.z>1.35&&o.z<3.0&&Math.abs(o.x-playerX)<.82){o.hit=true;if(o.type==='crystal'){score+=100;burst(o.mesh.position,0x75eaff,18);scene.remove(o.mesh)}else if(o.type==='gate'){score+=35;burst(o.mesh.position,0xb4a5ff,12);scene.remove(o.mesh)}else{shake=.28;finish();break}}
+ }
+ objects=objects.filter(o=>{if(o.hit||o.z>7){scene.remove(o.mesh);return false}return true});
+ for(const w of waveRings){w.life-=dt;w.radius+=dt*12;w.mesh.scale.setScalar(w.radius/.65);w.mesh.material.opacity=Math.max(0,w.life/w.max);for(const o of objects){if(o.hit||w.hit.has(o))continue;if(Math.abs(o.z-1.4)<w.radius*.65+1.1&&Math.abs(o.x-playerX)<w.radius+.45){w.hit.add(o);if(o.type==='spike'){o.type='crystal';scene.remove(o.mesh);o.mesh=makeCrystal();scene.add(o.mesh);o.mesh.position.set(o.x,1.05,o.z);burst(o.mesh.position,0xffb4d7,13)}else if(o.type==='gate'){o.hit=true;score+=75;burst(o.mesh.position,0xb4a5ff,14)}}}}
+ waveRings=waveRings.filter(w=>{if(w.life<=0){scene.remove(w.mesh);return false}return true});
+ for(const p of particles){p.life-=dt;p.mesh.position.addScaledVector(p.v,dt);p.v.y-=3*dt;p.mesh.scale.setScalar(Math.max(.01,p.life/p.max));p.mesh.material.opacity=Math.max(0,p.life/p.max)}particles=particles.filter(p=>{if(p.life<=0){scene.remove(p.mesh);return false}return true});
+ }
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);if(shake>0){shake=Math.max(0,shake-dt);camera.position.x+=(rand(-.12,.12))*shake*3}renderer.render(scene,camera)}animate();
+function resize(){if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.65));renderer.setSize(innerWidth,innerHeight)}addEventListener('resize',resize);
+const surface=renderer.domElement;surface.addEventListener('pointerdown',e=>{if(state!=='play')return;dragging=true;pointerStart=e.clientX;targetStart=targetX;surface.setPointerCapture(e.pointerId)});surface.addEventListener('pointermove',e=>{if(!dragging||state!=='play')return;const dx=(e.clientX-pointerStart)/(innerWidth*.24);targetX=clamp(targetStart+dx,-2.8,2.8)});const release=()=>{dragging=false};surface.addEventListener('pointerup',release);surface.addEventListener('pointercancel',release);
+ $('wave').addEventListener('pointerdown',e=>{e.stopPropagation();wave()});$('play').onclick=start;$('again').onclick=start;$('pause').onclick=()=>{if(state==='play'){state='paused';$('paused').classList.remove('hidden')}};$('resume').onclick=()=>{state='play';clock.getDelta();$('paused').classList.add('hidden')};
+})();
+</script>
+</body></html>
